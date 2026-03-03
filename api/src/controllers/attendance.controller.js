@@ -26,26 +26,29 @@ const OFFICE_HOURS = {
 // };
 
 const calculateLateMinutes = (timeIn) => {
-  // Convert UTC time to local time (Asia/Manila timezone)
-  const localTimeIn = moment(timeIn).utcOffset('+08:00'); // Philippines time (UTC+8)
+  // Convert the UTC time from DB to Philippine Time (UTC+8)
+  const phTimeIn = moment(timeIn).utc().add(8, 'hours');
   
-  // Create cutoff time in local time (8:00 AM local)
-  const cutoffTime = moment(timeIn)
-    .utcOffset('+08:00')
+  // Create cutoff at 8:00 AM Philippine Time on the same day
+  const phCutoff = moment(timeIn)
+    .utc()
+    .add(8, 'hours')
     .startOf('day')
     .hour(8)
     .minute(0)
     .second(0);
   
-  console.log('⏰ Local time in:', localTimeIn.format());
-  console.log('⏰ Cutoff time:', cutoffTime.format());
+  console.log('🔍 TimeIn (UTC):', moment(timeIn).utc().format());
+  console.log('🔍 TimeIn (PH):', phTimeIn.format('YYYY-MM-DD HH:mm:ss'));
+  console.log('🔍 Cutoff (PH):', phCutoff.format('YYYY-MM-DD HH:mm:ss'));
   
-  if (localTimeIn.isAfter(cutoffTime)) {
-    const lateMinutes = localTimeIn.diff(cutoffTime, 'minutes');
-    console.log('⏰ Late minutes:', lateMinutes);
+  if (phTimeIn.isAfter(phCutoff)) {
+    const lateMinutes = phTimeIn.diff(phCutoff, 'minutes');
+    console.log('🔍 Late minutes:', lateMinutes);
     return lateMinutes;
   }
   
+  console.log('🔍 Late minutes: 0 (on time or early)');
   return 0;
 };
 
