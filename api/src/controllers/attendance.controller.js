@@ -13,12 +13,37 @@ const OFFICE_HOURS = {
  * @param {Date} timeIn - Time in timestamp
  * @returns {number} - Minutes late
  */
-const calculateLateMinutes = (timeIn) => {
-  const timeInMoment = moment(timeIn);
-  const cutoffTime = moment(timeIn).startOf('day').hour(OFFICE_HOURS.START).minute(0).second(0);
+
+// const calculateLateMinutes = (timeIn) => {
+//   const timeInMoment = moment(timeIn);
+//   const cutoffTime = moment(timeIn).startOf('day').hour(OFFICE_HOURS.START).minute(0).second(0);
   
-  if (timeInMoment.isAfter(cutoffTime)) {
-    return timeInMoment.diff(cutoffTime, 'minutes');
+//   if (timeInMoment.isAfter(cutoffTime)) {
+//     return timeInMoment.diff(cutoffTime, 'minutes');
+//   }
+  
+//   return 0;
+// };
+
+const calculateLateMinutes = (timeIn) => {
+  // Convert UTC time to local time (Asia/Manila timezone)
+  const localTimeIn = moment(timeIn).utcOffset('+08:00'); // Philippines time (UTC+8)
+  
+  // Create cutoff time in local time (8:00 AM local)
+  const cutoffTime = moment(timeIn)
+    .utcOffset('+08:00')
+    .startOf('day')
+    .hour(8)
+    .minute(0)
+    .second(0);
+  
+  console.log('⏰ Local time in:', localTimeIn.format());
+  console.log('⏰ Cutoff time:', cutoffTime.format());
+  
+  if (localTimeIn.isAfter(cutoffTime)) {
+    const lateMinutes = localTimeIn.diff(cutoffTime, 'minutes');
+    console.log('⏰ Late minutes:', lateMinutes);
+    return lateMinutes;
   }
   
   return 0;
