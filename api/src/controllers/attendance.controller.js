@@ -771,14 +771,10 @@ const getTodayAttendance = async (req, res) => {
 const getEmployeeSummary = async (req, res) => {
   try {
     const { employeeId } = req.params;
-    const { months = 1, limit } = req.query;
+    const { months = 1 } = req.query;
 
     const startDate = moment().tz('Asia/Manila').subtract(months, 'months').format('YYYY-MM-DD');
     const endDate = moment().tz('Asia/Manila').format('YYYY-MM-DD');
-
-    if (limit) {
-      query = query.limit(parseInt(limit));
-    }
 
     const { data: attendance, error } = await supabase
       .from('attendance')
