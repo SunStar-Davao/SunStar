@@ -768,21 +768,83 @@ const getTodayAttendance = async (req, res) => {
  * @route   GET /api/attendance/summary/:employeeId
  * @access  Private
  */
+// const getEmployeeSummary = async (req, res) => {
+//   try {
+//     const { employeeId } = req.params;
+//     const { months = 1 } = req.query;
+
+//     const startDate = moment().tz('Asia/Manila').subtract(months, 'months').format('YYYY-MM-DD');
+//     const endDate = moment().tz('Asia/Manila').format('YYYY-MM-DD');
+
+//     const { data: attendance, error } = await supabase
+//       .from('attendance')
+//       .select('*')
+//       .eq('employee_id', employeeId)
+//       .gte('date', startDate)
+//       .lte('date', endDate)
+//       .order('date', { ascending: false });
+
+//     if (error) throw error;
+
+//     // Format times for display
+//     const attendanceWithDisplay = attendance.map(record => ({
+//       ...record,
+//       time_in_display: record.time_in ? moment(record.time_in).format('hh:mm A') : null,
+//       time_out_display: record.time_out ? moment(record.time_out).format('hh:mm A') : null,
+//       date_display: moment(record.date).format('MMM D, YYYY'),
+//     }));
+
+//     // Calculate summary
+//     const summary = {
+//       totalDays: attendance.length,
+//       present: attendance.filter(a => a.status === 'present').length,
+//       late: attendance.filter(a => a.status === 'late').length,
+//       absent: attendance.filter(a => a.status === 'absent').length,
+//       totalLateMinutes: attendance.reduce((acc, curr) => acc + (curr.late_minutes || 0), 0),
+//       averageLateMinutes: attendance.length > 0 
+//         ? Math.round(attendance.reduce((acc, curr) => acc + (curr.late_minutes || 0), 0) / attendance.length) 
+//         : 0
+//     };
+
+//     res.json({
+//       success: true,
+//       summary,
+//       attendance: attendanceWithDisplay
+//     });
+
+//   } catch (error) {
+//     console.error('Error fetching employee summary:', error);
+//     res.status(500).json({ 
+//       success: false,
+//       message: 'Server error while fetching employee summary',
+//       error: process.env.NODE_ENV === 'development' ? error.message : undefined
+//     });
+//   }
+// };
+
+
 const getEmployeeSummary = async (req, res) => {
   try {
     const { employeeId } = req.params;
-    const { months = 1 } = req.query;
+    const { months = 1, limit } = req.query; // Add limit here
 
     const startDate = moment().tz('Asia/Manila').subtract(months, 'months').format('YYYY-MM-DD');
     const endDate = moment().tz('Asia/Manila').format('YYYY-MM-DD');
 
-    const { data: attendance, error } = await supabase
+    let query = supabase
       .from('attendance')
       .select('*')
       .eq('employee_id', employeeId)
       .gte('date', startDate)
       .lte('date', endDate)
       .order('date', { ascending: false });
+
+    // Apply limit if provided
+    if (limit) {
+      query = query.limit(parseInt(limit));
+    }
+
+    const { data: attendance, error } = await query;
 
     if (error) throw error;
 
