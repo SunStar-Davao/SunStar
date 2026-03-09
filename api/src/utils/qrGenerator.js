@@ -120,14 +120,14 @@ const validateQRData = (qrData) => {
     }
 
     // Check if QR code is expired (24 hours validity)
-    if (parsed.timestamp) {
-      const age = Date.now() - parsed.timestamp;
-      const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+    // if (parsed.timestamp) {
+    //   const age = Date.now() - parsed.timestamp;
+    //   const maxAge = 24 * 60 * 60 * 1000; // 24 hours
       
-      if (age > maxAge) {
-        throw new Error('QR code has expired');
-      }
-    }
+    //   if (age > maxAge) {
+    //     throw new Error('QR code has expired');
+    //   }
+    // }
 
     return parsed;
   } catch (error) {
